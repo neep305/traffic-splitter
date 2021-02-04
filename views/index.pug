@@ -3,7 +3,7 @@ extends layout
 block content
   section.jumbotron.text-center
     .container
-      h1.jumbotron-heading Traffic allocation
+      h1.jumbotron-heading Ball Test
       p.lead.text-muted
         | It is a page for testing traffic allocation.
   .album.py-5.bg-light
@@ -26,5 +26,4 @@ block append-script
         $.blockUI();
         setTimeout(()=> {$.unblockUI();}, 2000);
       });
-      //- console.log(getCookie('variant')
     });

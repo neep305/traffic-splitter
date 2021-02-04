@@ -11,29 +11,33 @@ router.get('/', (req, res, next) => {
 
 router.post('/expInfo', (req, res) => {
   const userId = req.body.userId || 'anonymous';
-  let variant = req.body.variant;
-  winston.debug(`expInfo call. userId: ${userId}, variant: ${variant}`);
-  // alloc a new variant (50:50)
+  let variation = req.body.variation;
+  winston.debug(`expInfo call. userId: ${userId}, variation: ${variation}`);
+
+  // Traffic is allocating by switching flag. 50:50
   if (_checkNewUser(userId)) {
     winston.debug(`${userId} is a new visitor`);
+
+    // flag to switch the variation
     prev = !prev;
 
-    if (prev) variant = 'A';
-    else variant = 'B';
+    if (prev) variation = 'A';
+    else variation = 'B';
   }
   
-  // only for checking the number of each variant
-  if (trafficCount[variant] === undefined) {
-    trafficCount[variant] = {count: 0};
+  // Counting visits of each userId
+  if (trafficCount[variation] === undefined) {
+    trafficCount[variation] = {count: 0};
   }
-  trafficCount[variant].count += 1;
+  trafficCount[variation].count += 1;
   winston.debug(`trafficAllocCount: ${JSON.stringify(trafficCount)}`);
 
-  // init visitData
-  if (visitData[userId] === undefined) {
-    visitData[userId] = { variant: variant, visits: 0 };
+  // Initialize visitData. 
+  if (visitData[userId] === undefined) { // If you're a new visitor
+    visitData[userId] = { variation: variation, visits: 0 };
   }
-  visitData[userId] = {userId: userId, variant: variant, visits: visitData[userId].visits + 1}
+  // Add visit count
+  visitData[userId] = {userId: userId, variation: variation, visits: visitData[userId].visits + 1}
   
   // return result
   res.status(201).json({
@@ -41,16 +45,11 @@ router.post('/expInfo', (req, res) => {
   });
 });
 
-const _getVariantId = (max) => {
-  // const variant = Math.floor(Math.random() * Math.floor(max)) === 0 ? 'A' : 'B';
-  const variant = Math.random() > 0.5 ? 'A' : 'B';
-  return variant;
-}
-
-const _trafficAlloc = (prev) => {
-  return !prev
-}
-
+/**
+ * check the userId received and distinguish whether it is a new visitor
+ * @param {string} userId
+ * @returns {boolean} 
+ */
 const _checkNewUser = (userId) => {
   let isNewUser = false;
   if (visitData[userId] == undefined) {

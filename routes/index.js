@@ -3,16 +3,11 @@ const router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  const uuid = req.query.uuid || 0;
-  const variant = req.query.variant || 'A';
-  let color = 'red';
-  if (variant !== 'A') {
-    color = 'blue';
-  }
-  res.render('index', { color: color });
+  
+  res.render('index', { title: 'Traffic Splitter' });
 });
 
-//nocache 처리
+//nocache
 const nocache = (req, res, next) => {
   res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
   res.header('Expires', '-1');
